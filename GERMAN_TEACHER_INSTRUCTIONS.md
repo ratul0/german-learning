@@ -2,19 +2,20 @@
 
 ## How This Works
 
-This folder contains a complete German learning system with a SQLite database tracking Yousuf's progress from A1 → B1. Every time Yousuf starts a new session, Claude should:
+This folder contains a complete German learning system with a SQLite database tracking Yousuf's progress from A1 → B1. All files (this instructions file, session_engine.py, german_learning.db) live in the same folder. Use the workspace/mounted folder path — never hard-code session paths.
 
-1. **Read this file first** to understand the system
+The "german-lesson" skill handles session startup automatically. When Yousuf asks to start a lesson, the skill triggers and tells Claude to:
+
+1. **Read this file** to understand the system
 2. **Run the session engine** to check current progress
 3. **Teach the recommended topic** following the lesson format below
 4. **Update the database** after the lesson
-5. **Generate the dashboard** at the end
 
 ## Quick Start Commands
 
 ```bash
-DB="/sessions/elegant-affectionate-cannon/mnt/german language/german_learning.db"
-ENGINE="/sessions/elegant-affectionate-cannon/mnt/german language/session_engine.py"
+DB="german_learning.db"
+ENGINE="session_engine.py"
 
 # Step 1: Check progress
 python3 "$ENGINE" status
@@ -37,7 +38,7 @@ python3 "$ENGINE" log_session
 
 ## Database Location
 
-`/sessions/elegant-affectionate-cannon/mnt/german language/german_learning.db`
+`german_learning.db`
 
 ## Lesson Format (30 minutes)
 
@@ -71,7 +72,7 @@ python3 "$ENGINE" log_session
 import sqlite3
 from datetime import datetime, timedelta
 
-DB = "/sessions/elegant-affectionate-cannon/mnt/german language/german_learning.db"
+DB = "german_learning.db"
 conn = sqlite3.connect(DB)
 c = conn.cursor()
 today = datetime.now().strftime("%Y-%m-%d")
@@ -133,10 +134,6 @@ c.execute("""INSERT INTO weaknesses (category, description, related_topic_id, se
 c.execute("UPDATE weaknesses SET resolved_date=? WHERE id=?", (today, weakness_id))
 ```
 
-## Regenerate Dashboard
-
-After every session: `python3 "/sessions/elegant-affectionate-cannon/mnt/german language/generate_dashboard.py"`
-
 ## Learner Profile
 
 - **Name**: Yousuf
@@ -160,4 +157,3 @@ After every session: `python3 "/sessions/elegant-affectionate-cannon/mnt/german 
 - Add vocabulary to the database as you teach it, so it persists across sessions
 - If the user seems frustrated, slow down and do more examples before exercises
 - Track weaknesses in the database so they get addressed in future sessions
-- Regenerate the dashboard after each session so the user can see their progress

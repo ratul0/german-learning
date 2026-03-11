@@ -16,15 +16,77 @@ import json
 import sys
 import os
 from datetime import datetime, timedelta
+from db_helper import open_db
 
 # Dynamically resolve paths relative to this script's location
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(_SCRIPT_DIR, "german_learning.db")
 
-def get_conn():
-    conn = sqlite3.connect(DB)
-    conn.row_factory = sqlite3.Row
-    return conn
+def get_conn(write=False):
+    """Get a safe DB connection. Use write=True if you'll modify data.
+
+    NOTE: When write=True on a mounted filesystem, you MUST call
+    conn._db_helper_finish() instead of conn.close() to copy changes back.
+    """
+    return open_db.__wrapped__(write=write)
+
+
+class _SafeConnection:
+    """Wrapper that copies the DB to temp for safe access and back on close if writable."""
+
+    def __init__(self, write=False):
+        import shutil, tempfile
+        self._write = write
+        self._db_path = DB
+        self._tmp_dir = None
+
+        # Try direct access first (must query real data, not just SELECT 1)
+        try:
+            test = sqlite3.connect(DB)
+            test.execute("SELECT name FROM sqlite_master WHERE type='table' LIMIT 1")
+            test.close()
+            self._active_path = DB
+        except sqlite3.OperationalError:
+            self._tmp_dir = tempfile.mkdtemp(prefix="german_db_")
+            self._active_path = os.path.join(self._tmp_dir, "german_learning.db")
+            shutil.copy2(DB, self._active_path)
+
+        self._conn = sqlite3.connect(self._active_path)
+        self._conn.row_factory = sqlite3.Row
+
+    @property
+    def row_factory(self):
+        return self._conn.row_factory
+
+    @row_factory.setter
+    def row_factory(self, value):
+        self._conn.row_factory = value
+
+    def cursor(self):
+        return self._conn.cursor()
+
+    def commit(self):
+        return self._conn.commit()
+
+    def execute(self, *args, **kwargs):
+        return self._conn.execute(*args, **kwargs)
+
+    def close(self):
+        import shutil
+        self._conn.close()
+        if self._tmp_dir:
+            if self._write:
+                shutil.copy2(self._active_path, self._db_path)
+            try:
+                os.remove(self._active_path)
+                os.rmdir(self._tmp_dir)
+            except OSError:
+                pass
+
+
+def get_conn(write=False):
+    """Get a safe DB connection. Use write=True if you'll modify data."""
+    return _SafeConnection(write=write)
 
 # ─── STATUS ───
 
@@ -255,7 +317,7 @@ def search(query):
 
 def log_session_interactive():
     """Called from within Claude to log a session."""
-    conn = get_conn()
+    conn = get_conn(write=True)
     c = conn.cursor()
     today = datetime.now().strftime("%Y-%m-%d")
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -278,7 +340,7 @@ def log_session_interactive():
 # ─── UPDATE TOPIC PROGRESS ───
 
 def update_topic(topic_id, status=None, confidence=None, weak_areas=None):
-    conn = get_conn()
+    conn = get_conn(write=True)
     c = conn.cursor()
     now = datetime.now().strftime("%Y-%m-%d")
 
@@ -331,7 +393,7 @@ def update_topic(topic_id, status=None, confidence=None, weak_areas=None):
 # ─── COMPLETE SESSION ───
 
 def complete_session(session_id, duration, topics_covered, exercises_attempted, exercises_correct, notes, mood):
-    conn = get_conn()
+    conn = get_conn(write=True)
     c = conn.cursor()
     c.execute("""UPDATE sessions SET
         duration_minutes=?, topics_covered=?, exercises_attempted=?,

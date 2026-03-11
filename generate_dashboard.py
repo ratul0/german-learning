@@ -1,6 +1,7 @@
 """Generate an HTML progress dashboard for the German Learning System."""
 import sqlite3, json, os
 from datetime import datetime
+from db_helper import open_db
 
 # Dynamically resolve paths relative to this script's location
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,14 +62,19 @@ def build_session_prompt(c, topics, sessions, weaknesses, today):
     introduced = sum(1 for t in topics if t['status'] == 'introduced')
     not_started_count = sum(1 for t in topics if t['status'] == 'not_started')
 
-    prompt = f"""Let's do our German lesson today. Please start by reading my learning system instructions and then run my session engine to begin.
+    prompt = f"""Let's do our German lesson today.
 
-STEP 1: Read the instructions file:
-  Read file: {_SCRIPT_DIR}/GERMAN_TEACHER_INSTRUCTIONS.md
+In the folder you have access to, you'll find my German learning system. Look for these files:
+- GERMAN_TEACHER_INSTRUCTIONS.md — read this first for full session instructions
+- session_engine.py — run this to check my progress
+- german_learning.db — my SQLite database with all progress data
+- generate_dashboard.py — regenerate my dashboard at the end
 
-STEP 2: Run these commands to load my current state:
-  python3 "{_SCRIPT_DIR}/session_engine.py" next
-  python3 "{_SCRIPT_DIR}/session_engine.py" review
+STEP 1: Read GERMAN_TEACHER_INSTRUCTIONS.md from the folder.
+
+STEP 2: Run the session engine (use the path where you find the files):
+  python3 session_engine.py next
+  python3 session_engine.py review
 
 STEP 3: Here is my current progress snapshot (auto-generated on {today}):
 
@@ -90,14 +96,16 @@ ACTIVE WEAKNESSES:
 {weakness_block}
 
 STEP 4: Based on the above, run today's 30-minute lesson following the format in the instructions file (5 min review → 20 min teach/practice → 5 min wrap-up). At the end of the session, update my database and regenerate the dashboard:
-  python3 "{_SCRIPT_DIR}/generate_dashboard.py"
+  python3 generate_dashboard.py
 """
     return prompt
 
 
 def generate():
-    conn = sqlite3.connect(DB)
-    conn.row_factory = sqlite3.Row
+    with open_db() as conn:
+        _generate_inner(conn)
+
+def _generate_inner(conn):
     c = conn.cursor()
 
     # ── Gather data ──
@@ -533,7 +541,6 @@ function togglePreview() {{
     with open(OUT, 'w') as f:
         f.write(html)
     print(f"✅ Dashboard generated: {OUT}")
-    conn.close()
 
 if __name__ == "__main__":
     generate()

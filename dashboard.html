@@ -159,7 +159,7 @@ tr:last-child td { border-bottom: none; }
 
 <div class="header">
     <h1>🇩🇪 German B1 Journey</h1>
-    <div class="subtitle">Last updated March 11, 2026 at 11:26 &middot; Goal: Goethe B1 Exam &middot; Passport</div>
+    <div class="subtitle">Last updated March 11, 2026 at 11:48 &middot; Goal: Goethe B1 Exam &middot; Passport</div>
 </div>
 
 <div class="session-cta">
@@ -172,14 +172,19 @@ tr:last-child td { border-bottom: none; }
         </button>
     </div>
     <button class="toggle-preview" onclick="togglePreview()" id="toggleBtn">Show prompt preview</button>
-    <div class="cta-preview" id="promptPreview">Let's do our German lesson today. Please start by reading my learning system instructions and then run my session engine to begin.
+    <div class="cta-preview" id="promptPreview">Let's do our German lesson today.
 
-STEP 1: Read the instructions file:
-  Read file: /sessions/lucid-compassionate-feynman/GERMAN_TEACHER_INSTRUCTIONS.md
+In the folder you have access to, you'll find my German learning system. Look for these files:
+- GERMAN_TEACHER_INSTRUCTIONS.md — read this first for full session instructions
+- session_engine.py — run this to check my progress
+- german_learning.db — my SQLite database with all progress data
+- generate_dashboard.py — regenerate my dashboard at the end
 
-STEP 2: Run these commands to load my current state:
-  python3 "/sessions/lucid-compassionate-feynman/session_engine.py" next
-  python3 "/sessions/lucid-compassionate-feynman/session_engine.py" review
+STEP 1: Read GERMAN_TEACHER_INSTRUCTIONS.md from the folder.
+
+STEP 2: Run the session engine (use the path where you find the files):
+  python3 session_engine.py next
+  python3 session_engine.py review
 
 STEP 3: Here is my current progress snapshot (auto-generated on 2026-03-11):
 
@@ -204,7 +209,7 @@ ACTIVE WEAKNESSES:
   - [low] wohnen (reside) vs leben (be alive) distinction
 
 STEP 4: Based on the above, run today's 30-minute lesson following the format in the instructions file (5 min review → 20 min teach/practice → 5 min wrap-up). At the end of the session, update my database and regenerate the dashboard:
-  python3 "/sessions/lucid-compassionate-feynman/generate_dashboard.py"
+  python3 generate_dashboard.py
 </div>
 </div>
 
@@ -990,7 +995,7 @@ STEP 4: Based on the above, run today's 30-minute lesson following the format in
 
 </div>
 <script>
-const sessionPrompt = "Let's do our German lesson today. Please start by reading my learning system instructions and then run my session engine to begin.\n\nSTEP 1: Read the instructions file:\n  Read file: /sessions/lucid-compassionate-feynman/GERMAN_TEACHER_INSTRUCTIONS.md\n\nSTEP 2: Run these commands to load my current state:\n  python3 \"/sessions/lucid-compassionate-feynman/session_engine.py\" next\n  python3 \"/sessions/lucid-compassionate-feynman/session_engine.py\" review\n\nSTEP 3: Here is my current progress snapshot (auto-generated on 2026-03-11):\n\nOVERALL: 0/30 mastered, 1 in progress, 1 introduced, 28 not started\n\nRECENT SESSIONS:\n  - 2026-03-11: 30min, score=20/21, mood=ok, notes=\"Lesson 2: Present Tense Regular Verbs. 5/5 review, 6/6 conjugation, 5/6 translation (wohnen/leben mix-up), 4/4 error correction, 5/5 sentence building. 95% overall.\"\n  - 2026-03-11: 30min, score=11/11, mood=ok, notes=\"Second session: Articles & Noun Gender. Perfect score - fill in blank, translate, fix mistakes, real-life sentences.\"\n  - 2026-03-11: 30min, score=11/11, mood=ok, notes=\"First lesson: Articles & Noun Gender. Perfect score on all exercises.\"\n\nREVIEWS DUE TODAY:\n  (None due today)\n\nWEAKEST TOPICS:\n  (No weak topics yet)\n\nNEXT NEW TOPIC:\n  [id=3] [A1] Present Tense \u2014 Irregular Verbs (sein, haben, werden)\n  \"The three most important irregular verbs \u2014 memorize these cold.\"\n\nACTIVE WEAKNESSES:\n  - [low] wohnen (reside) vs leben (be alive) distinction\n\nSTEP 4: Based on the above, run today's 30-minute lesson following the format in the instructions file (5 min review \u2192 20 min teach/practice \u2192 5 min wrap-up). At the end of the session, update my database and regenerate the dashboard:\n  python3 \"/sessions/lucid-compassionate-feynman/generate_dashboard.py\"\n";
+const sessionPrompt = "Let's do our German lesson today.\n\nIn the folder you have access to, you'll find my German learning system. Look for these files:\n- GERMAN_TEACHER_INSTRUCTIONS.md \u2014 read this first for full session instructions\n- session_engine.py \u2014 run this to check my progress\n- german_learning.db \u2014 my SQLite database with all progress data\n- generate_dashboard.py \u2014 regenerate my dashboard at the end\n\nSTEP 1: Read GERMAN_TEACHER_INSTRUCTIONS.md from the folder.\n\nSTEP 2: Run the session engine (use the path where you find the files):\n  python3 session_engine.py next\n  python3 session_engine.py review\n\nSTEP 3: Here is my current progress snapshot (auto-generated on 2026-03-11):\n\nOVERALL: 0/30 mastered, 1 in progress, 1 introduced, 28 not started\n\nRECENT SESSIONS:\n  - 2026-03-11: 30min, score=20/21, mood=ok, notes=\"Lesson 2: Present Tense Regular Verbs. 5/5 review, 6/6 conjugation, 5/6 translation (wohnen/leben mix-up), 4/4 error correction, 5/5 sentence building. 95% overall.\"\n  - 2026-03-11: 30min, score=11/11, mood=ok, notes=\"Second session: Articles & Noun Gender. Perfect score - fill in blank, translate, fix mistakes, real-life sentences.\"\n  - 2026-03-11: 30min, score=11/11, mood=ok, notes=\"First lesson: Articles & Noun Gender. Perfect score on all exercises.\"\n\nREVIEWS DUE TODAY:\n  (None due today)\n\nWEAKEST TOPICS:\n  (No weak topics yet)\n\nNEXT NEW TOPIC:\n  [id=3] [A1] Present Tense \u2014 Irregular Verbs (sein, haben, werden)\n  \"The three most important irregular verbs \u2014 memorize these cold.\"\n\nACTIVE WEAKNESSES:\n  - [low] wohnen (reside) vs leben (be alive) distinction\n\nSTEP 4: Based on the above, run today's 30-minute lesson following the format in the instructions file (5 min review \u2192 20 min teach/practice \u2192 5 min wrap-up). At the end of the session, update my database and regenerate the dashboard:\n  python3 generate_dashboard.py\n";
 
 function copyPrompt() {
     navigator.clipboard.writeText(sessionPrompt).then(() => {
